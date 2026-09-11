@@ -13,6 +13,11 @@
 #SBATCH -e rs1a-slurm.%N.%j.err # STDERR
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
+/data/miniconda3/bin/conda init
+source ~/.bashrc
+envarg=`/data/src/PyHipp/envlist.py`
+conda activate $envarg
+
 python -u -c "import PyHipp as pyh; \
 import DataProcessingTools as DPT; \
 import time; \
@@ -22,5 +27,8 @@ print(time.localtime()); \
 DPT.objects.processDirs(dirs=None, objtype=pyh.RPLSplit, channel=[*range(1,33)], SkipHPC=False, HPCScriptsDir = '/data/src/PyHipp/', SkipLFP=False, SkipHighPass=False, SkipSort=False); \
 print(time.localtime()); \
 print(time.time()-t0);"
+
+conda deactivate
+/data/src/PyHipp/envlist.py $envarg
 
 aws sns publish --topic-arn arn:aws:sns:ap-southeast-1:106088256647:awsnotify --message "RS1aJobDone"

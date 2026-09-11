@@ -13,6 +13,11 @@
 #SBATCH -e rplspl-slurm.%N.%j.err # STDERR
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
+/data/miniconda3/bin/conda init
+source ~/.bashrc
+envarg=`/data/src/PyHipp/envlist.py`
+conda activate $envarg
+
 python -u -c "import PyHipp as pyh; \
 import DataProcessingTools as DPT; \
 import os; \
@@ -26,6 +31,9 @@ os.chdir('session01'); \
 DPT.objects.processDirs(level='channel', cmd='import PyHipp as pyh; from PyHipp import mountain_batch; mountain_batch.mountain_batch(); from PyHipp import export_mountain_cells; export_mountain_cells.export_mountain_cells();'); \
 print(time.localtime()); \
 print(time.time()-t0);"
+
+conda deactivate
+/data/src/PyHipp/envlist.py $envarg
 
 aws sns publish --topic-arn arn:aws:sns:ap-southeast-1:106088256647:awsnotify --message "RPLSplitJobDone"
 
